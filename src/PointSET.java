@@ -42,7 +42,9 @@ public class PointSET {
      * draw all of the points to standard draw
      */
     public void draw() {
-        
+        for (Point2D point: mPoints) {
+            point.draw();
+        }
     }
 
     /**
