@@ -18,20 +18,20 @@ public class RangeSearchVisualizer {
     public static void main(String[] args) {
 
 //        String filename = args[0];
-        String filename = "kdtree/input10K.txt";
+        String filename = "kdtree/circle10.txt";
         In in = new In(filename);
 
 
-        StdDraw.show(0);
+//        StdDraw.show(0);    
 
         // initialize the data structures with N points from standard input
         PointSET brute = new PointSET();
-//        KdTree kdtree = new KdTree();
+        KdTree kdtree = new KdTree();
         while (!in.isEmpty()) {
             double x = in.readDouble();
             double y = in.readDouble();
             Point2D p = new Point2D(x, y);
-//            kdtree.insert(p);
+            kdtree.insert(p);
             brute.insert(p);
         }
 
@@ -43,9 +43,10 @@ public class RangeSearchVisualizer {
         StdDraw.clear();
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.setPenRadius(.01);
-        brute.draw();
+        kdtree.draw();
+        StdDraw.show();
 
-        while (true) {
+/*        while (true) {
             StdDraw.show(40);
 
             // user starts to drag a rectangle
@@ -91,10 +92,10 @@ public class RangeSearchVisualizer {
             // draw the range search results for kd-tree in blue
             StdDraw.setPenRadius(.02);
             StdDraw.setPenColor(StdDraw.BLUE);
-//            for (Point2D p : kdtree.range(rect))
-//                p.draw();
+            for (Point2D p : kdtree.range(rect))
+                p.draw();
 
             StdDraw.show(40);
-        }
+        }*/
     }
 }
