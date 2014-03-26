@@ -39,9 +39,22 @@ public class KdTree {
         if (x == null) {
             return createNode(p, v);
         }
-        int cmp = x.p.compareTo(p);
-        if (cmp < 0) x.lb = insert(x.lb, p, !x.v);
-        else if (cmp > 0) x.rt = insert(x.rt, p, !x.v);
+        int cmp;
+        if (v) {
+            cmp = Point2D.X_ORDER.compare(x.p, p);
+        } else {
+            cmp = Point2D.Y_ORDER.compare(x.p, p);
+        }
+        if (cmp > 0) x.lb = insert(x.lb, p, !x.v);
+        else if (cmp < 0) x.rt = insert(x.rt, p, !x.v);
+        else {
+            if (v) {
+                cmp = Point2D.Y_ORDER.compare(x.p, p);
+            } else {
+                cmp = Point2D.X_ORDER.compare(x.p, p);
+            }
+            if (cmp != 0) x.rt = insert(x.rt, p, !x.v);
+        }
         return x;
     }
 
@@ -63,16 +76,21 @@ public class KdTree {
      * @return does the set contain the point p?
      */
     public boolean contains(Point2D p) {
-        return contains(root, p);
+        return contains(root, p, true);
     }
 
-    private boolean contains(Node x, Point2D p) {
+    private boolean contains(Node x, Point2D p, boolean v) {
         if (x == null) {
             return false;
         }
-        int cmp = x.p.compareTo(p);
-        if (cmp < 0) return contains(x, p);
-        else if (cmp > 0) return contains(x, p);
+        int cmp;
+        if (v) {
+            cmp = Point2D.X_ORDER.compare(x.p, p);
+        } else {
+            cmp = Point2D.Y_ORDER.compare(x.p, p);
+        }
+        if (cmp > 0) return contains(x.lb, p, !v);
+        else if (cmp < 0) return contains(x.rt, p, !v);
         return true;
     }
 
@@ -93,6 +111,9 @@ public class KdTree {
                 this.y0 = y0;
                 this.x1 = x1;
                 this.y1 = y1;
+            }
+            public String toString() {
+                return node.p.toString() + "[" + x0 + ", " + y0 + ", " + x1 + ", " + y1 + "]";
             }
         };
         Queue<NodeWithLimitations> bfs = new Queue<NodeWithLimitations>();
@@ -126,7 +147,7 @@ public class KdTree {
                 if (node.node.v) {
                     tmp = new NodeWithLimitations(node.node.rt, node.node.p.x(), node.y0, node.x1, node.y1);
                 } else {
-                    tmp = new NodeWithLimitations(node.node.rt, node.x0, node.y0, node.node.p.y(), node.y1);
+                    tmp = new NodeWithLimitations(node.node.rt, node.x0, node.node.p.y(), node.x1, node.y1);
                 }
                 bfs.enqueue(tmp);
             }
@@ -174,5 +195,4 @@ public class KdTree {
     public Point2D nearest(Point2D p) {
         return null;
     }
-    
 }
