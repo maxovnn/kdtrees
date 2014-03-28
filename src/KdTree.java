@@ -1,7 +1,6 @@
 public class KdTree {
     private Node root;
     private int size;
-    private RectHV parent;
     
     private static class Node {
         private final Point2D p;      // the point
@@ -18,7 +17,6 @@ public class KdTree {
      * construct an empty set of points
      */
     public KdTree() {
-        parent = new RectHV(0, 0, 1, 1);
     }
 
     /**
@@ -76,11 +74,26 @@ public class KdTree {
      * @return does the set contain the point p?
      */
     public boolean contains(Point2D p) {
-        return contains(root, p, true);
+        Point2D test = nearest(p);
+        if (test == null) return false;
+        return test.equals(p);
+//        return contains(root, p, true);
     }
 
     private boolean contains(Node x, Point2D p, boolean v) {
-        if (x == null) {
+        Queue<Node> bfs = new Queue<Node>();
+        Node node = null;
+        bfs.enqueue(root);
+        while (!bfs.isEmpty()) {
+            node = bfs.dequeue();
+            if (node.p.compareTo(p) == 0) {
+                return true;
+            }
+            if (node.lb != null) bfs.enqueue(node.lb);
+            if (node.rt != null) bfs.enqueue(node.rt);
+        }
+        return false;
+            /*        if (x == null || p == null) {
             return false;
         }
         int cmp;
@@ -91,7 +104,7 @@ public class KdTree {
         }
         if (cmp > 0) return contains(x.lb, p, !v);
         else if (cmp < 0) return contains(x.rt, p, !v);
-        return true;
+        return true;*/
     }
 
     /**
@@ -193,6 +206,80 @@ public class KdTree {
      * @return a nearest neighbor in the set to p; null if set is empty
      */
     public Point2D nearest(Point2D p) {
-        return null;
+        Point2D nearest = (root == null)?null:root.p;
+        Queue<Node> bfs = new Queue<Node>();
+        Node node = null;
+        bfs.enqueue(root);
+        double dist;
+        while (!bfs.isEmpty()) {
+            node = bfs.dequeue();
+            if (nearest.distanceTo(p) > node.p.distanceTo(p)) {
+                nearest = node.p;
+            }
+            if (node.v) {
+                dist = node.p.x() - p.x();
+            } else {
+                dist = node.p.y() - p.y();
+            }
+            if (Double.compare(node.p.distanceTo(p), Math.abs(dist)) > 0) {
+                if (node.lb != null) {
+                    bfs.enqueue(node.lb);
+                }
+                if (node.rt != null) {
+                    bfs.enqueue(node.rt);
+                }
+            } else {
+                if (Double.compare(dist, 0) > 0) {
+                    if (node.rt != null) {
+                        bfs.enqueue(node.rt);
+                    }
+                } else {
+                    if (node.lb != null) {
+                        bfs.enqueue(node.lb);
+                    }
+                }
+            } 
+        }
+        return nearest;
+    }
+    public static void main(String[] args) {
+        PointSET brute = new PointSET();
+        KdTree kdtree = new KdTree();
+        String filename = "kdtree/input200K.txt";
+        {
+            In in = new In(filename);
+
+            StdDraw.show(0);
+
+            // initialize the two data structures with point from standard input
+            while (!in.isEmpty()) {
+                double x = in.readDouble();
+                double y = in.readDouble();
+                Point2D p = new Point2D(x, y);
+                kdtree.insert(p);
+                brute.insert(p);
+            }
+        }
+        {
+            In in = new In(filename);
+
+            StdDraw.show(0);
+
+            // initialize the two data structures with point from standard input
+            boolean bC = true;
+            boolean kC = true;
+            double bP;
+            double kP;
+            Point2D p = null;
+            do {
+                p = new Point2D(StdRandom.uniform(0.0, 1.0), StdRandom.uniform(0.0, 1.0));
+                bC = kdtree.contains(p);
+                kC = brute.contains(p);
+                bP = brute.nearest(p).distanceTo(p);
+                kP = kdtree.nearest(p).distanceTo(p);
+            } while (bC == kC && Double.compare(bP, kP) == 0);
+            int ii = 0;
+            ii++;
+        }
     }
 }
