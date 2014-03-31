@@ -66,6 +66,11 @@ public class KdTree {
      * @param p
      */
     public void insert(Point2D p) {
+        Point2D test = new Point2D(0.192618, 0.9539);
+        if (test.equals(p)) {
+            int ii = 0;
+            ii++;
+        }
         root = insert(root, p, true);
     }
 
@@ -270,14 +275,22 @@ public class KdTree {
             boolean kC = true;
             double bP;
             double kP;
-            Point2D p = null;
+            Point2D p,d, bPoint, kPoint = null;
+            double testTime;
             do {
-                p = new Point2D(StdRandom.uniform(0.0, 1.0), StdRandom.uniform(0.0, 1.0));
-                bC = kdtree.contains(p);
-                kC = brute.contains(p);
-                bP = brute.nearest(p).distanceTo(p);
-                kP = kdtree.nearest(p).distanceTo(p);
-            } while (bC == kC && Double.compare(bP, kP) == 0);
+                p = new Point2D(0.190597, 0.9550);
+                d = new Point2D(0.192618, 0.9539);
+                bC = brute.contains(d);
+                kC = kdtree.contains(d);
+                Stopwatch watch  = new Stopwatch();
+                bPoint = brute.nearest(d);
+                testTime = watch.elapsedTime();
+                bP = bPoint.distanceTo(p);
+                watch  = new Stopwatch();
+                kPoint = kdtree.nearest(d); 
+                testTime = watch.elapsedTime();
+                kP = kPoint.distanceTo(p);
+            } while (Double.compare(bP, kP) == 0);
             int ii = 0;
             ii++;
         }
